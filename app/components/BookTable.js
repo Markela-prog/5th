@@ -9,7 +9,7 @@ export default function BookTable({ language, seed, likes, rating, reviews}) {
   const [hasMore, setHasMore] = useState(true);
   const [expandedRow, setExpandedRow] = useState(null);
 
-  const batchSize = 20;
+  const batchSize = 50;
 
   const fetchBooks = async (pageNumber) => {
     const { generateBooks } = await import("../utils/bookGenerator");
