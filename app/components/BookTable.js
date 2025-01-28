@@ -3,7 +3,13 @@
 import React, { useState, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
-export default function BookTable({ language, seed, likes, rating, reviews}) {
+export default function BookTable({
+  language,
+  seed,
+  likes,
+  rating,
+  reviews,
+}) {
   const [books, setBooks] = useState([]);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
@@ -11,7 +17,7 @@ export default function BookTable({ language, seed, likes, rating, reviews}) {
 
   const batchSize = 50;
 
-  const fetchBooks = async (pageNumber) => {
+  const fetchBooks = async (pageNumber, reset = false) => {
     const { generateBooks } = await import("../utils/bookGenerator");
 
     const allBooks = generateBooks({
@@ -27,24 +33,22 @@ export default function BookTable({ language, seed, likes, rating, reviews}) {
       (book) => book.likes <= likes && book.rating >= rating
     );
 
-    if (filteredBooks.length === 0 && pageNumber === 0) {
-      setBooks([]);
-      setHasMore(false);
-      return;
-    } else if (filteredBooks.length === 0) {
-      setHasMore(false);
-      return;
+    if (reset) {
+      setBooks(filteredBooks);
+      setHasMore(filteredBooks.length > 0);
+    } else {
+      setBooks((prev) => [...prev, ...filteredBooks]);
+      if (filteredBooks.length === 0) setHasMore(false);
     }
-
-    setBooks((prev) => [...prev, ...filteredBooks]);
   };
 
   useEffect(() => {
+    // Reset the table whenever any of the dependencies change
     setBooks([]);
     setPage(0);
     setHasMore(true);
-    fetchBooks(0);
-  }, [language, seed, likes, rating]);
+    fetchBooks(0, true); // Fetch the first page with reset
+  }, [language, seed, likes, rating, reviews]);
 
   const loadMoreBooks = () => {
     const nextPage = page + 1;

@@ -11,16 +11,21 @@ export default function InfiniteScrollWrapper({
   const [books, setBooks] = useState([]);
   const [page, setPage] = useState(0);
 
-  const fetchBooks = () => {
+  const fetchBooks = (reset = false) => {
     const newBooks = generateBooks({ seed, page, likes, reviews, language });
-    setBooks((prev) => [...prev, ...newBooks]);
+
+    if (reset) {
+      setBooks(newBooks);
+    } else {
+      setBooks((prev) => [...prev, ...newBooks]);
+    }
   };
 
   useEffect(() => {
-    // Reset books and fetch new data on parameter changes
+    // Reset books and fetch new data on seed change
     setBooks([]);
     setPage(0);
-    fetchBooks();
+    fetchBooks(true); // Reset the data when seed changes
   }, [language, seed, likes, reviews]);
 
   useEffect(() => {
